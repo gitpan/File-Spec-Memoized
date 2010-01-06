@@ -1,5 +1,5 @@
 ---
-abstract: 'Makes File::Spec faster'
+abstract: 'Memoization of File::Spec to make it faster'
 author:
   - 'Goro Fuji (gfx) <gfuji(at)cpan.org>'
 build_requires:
@@ -25,5 +25,5 @@ requires:
   perl: 5.10.0
 resources:
   license: http://dev.perl.org/licenses/
-  repository: origin
-version: 0.001
+  repository: git://github.com/gfx/Perl-File-Spec-Memoized.git
+version: 0.002
