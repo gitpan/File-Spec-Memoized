@@ -3,15 +3,9 @@ package File::Spec::Memoized;
 use 5.006_002;
 use strict;
 
-our $VERSION = '0.003';
+our $VERSION = '1.00';
 
 use File::Spec;
-
-# Class hierarchy:
-# File::Spec -> File::Spec::Memoized -> File::Spec::$OS
-#               ^^^^^^^^^^^^^^^^^^^^
-our @ISA = @File::Spec::ISA;
-@File::Spec::ISA = (__PACKAGE__);
 
 # constants:
 #   curdir, updir, rootdir, devnull
@@ -33,7 +27,7 @@ foreach my $feature(qw(
     abs2rel
     rel2abs
 )) {
-    my $orig = "SUPER::$feature";
+    my $orig = File::Spec->can($feature) or die "Oops: $feature";
 
     my $fs   = '$' . $feature;
 
@@ -52,7 +46,7 @@ foreach my $feature(qw(
     splitpath
     splitdir
 )) {
-    my $orig = "SUPER::$feature";
+    my $orig = File::Spec->can($feature) or die "Oops: $feature";
 
     my $fl   = '@' . $feature;
 
@@ -71,6 +65,12 @@ sub flush_cache {
 
 sub __cache { \%cache }
 
+# Organize the class hierarchy:
+# File::Spec -> File::Spec::Memoized -> File::Spec::$OS
+#               ^^^^^^^^^^^^^^^^^^^^
+our @ISA = @File::Spec::ISA;
+@File::Spec::ISA = (__PACKAGE__);
+
 1;
 __END__
 
@@ -80,7 +80,7 @@ File::Spec::Memoized - Memoization of File::Spec to make it faster
 
 =head1 VERSION
 
-This document describes File::Spec::Memoized version 0.003.
+This document describes File::Spec::Memoized version 1.00.
 
 =head1 SYNOPSIS
 
@@ -93,12 +93,16 @@ This document describes File::Spec::Memoized version 0.003.
 
 =head1 DESCRIPTION
 
-File::Spec::Memoized makes File::Spec faster using B<memoization>
-(data caching). Once you load this module, File::Spec features
-will become significantly faster.
+File::Spec is used everywhere, but its performance is not so good
+because a lot of internal calls of C<canonpath()> consumes CPU.
 
-This module adopts File::Spec, so you need any changes in your program. All
-you have to do is say C<use File::Spec::Memoized>.
+File::Spec::Memoized applies File::Spec with B<memoization> technique
+(or data caching). Once you load this module, File::Spec methods
+will become significantly faster. Moreover, some modules that depend
+on File::Spec, e.g. C<Path::Class>, could become faster.
+
+This module adopts File::Spec methods, so you need no changes in your
+program. All you have to do is say C<use File::Spec::Memoized>.
 
 =head1 INTERFACE
 
@@ -114,7 +118,7 @@ Clears the cache and frees the memory used for the cache.
 
 =head1 DEPENDENCIES
 
-Perl 5.10.0 or later.
+Perl 5.6.2 or later.
 
 =head1 BUGS
 
